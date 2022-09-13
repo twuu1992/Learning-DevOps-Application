@@ -1,47 +1,17 @@
 version: '3'
 
 services:
-  mongo:
-    image: 'mongo:latest'
-    restart: always
-    env_file:
-      - dev.env
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: $MONGODB_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGODB_PASSWORD
-    volumes:
-      - mongo:/data/db
-    ports:
-      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
-
   api:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./server
-    volumes:
-      - /app/node_modules
-      - ./server:/app
-    env_file:
-      - dev.env
+    image: "tianlin976/user-server"
+    mem_limit: 128m
     environment:
-      - MONGODB_URI=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo:${MONGODB_LOCAL_PORT}/
+      - MONGODB_URI=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_SERVER_IP}:${MONGODB_LOCAL_PORT}/
       - NODE_ENV=dev
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-    depends_on:
-      - mongo
 
   client:
-    build:
-      dockerfile: Dockerfile.dev
-      context: ./client
-    env_file:
-      - dev.env
-    volumes:
-      - /app/node_modules
-      - ./client:/app
+    image: "tianlin976/user-client"
+    mem_limit: 128m
     ports:
       - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
-
-volumes:
-  mongo:
