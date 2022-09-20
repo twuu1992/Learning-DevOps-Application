@@ -4,8 +4,6 @@ services:
   mongo:
     image: 'mongo:latest'
     restart: always
-    env_file:
-      - dev.env
     environment:
       MONGO_INITDB_ROOT_USERNAME: $MONGODB_USERNAME
       MONGO_INITDB_ROOT_PASSWORD: $MONGODB_PASSWORD
@@ -13,6 +11,22 @@ services:
       - mongo:/data/db
     ports:
       - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+    networks:
+      - network
+
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: unless-stopped
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    networks:
+      - network
 
   api:
     build:
@@ -21,27 +35,27 @@ services:
     volumes:
       - /app/node_modules
       - ./server:/app
-    env_file:
-      - dev.env
     environment:
       - MONGODB_URI=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo:${MONGODB_LOCAL_PORT}/
       - NODE_ENV=dev
-    ports:
-      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
     depends_on:
       - mongo
+    networks:
+      - network
 
   client:
     build:
       dockerfile: Dockerfile.dev
       context: ./client
-    env_file:
-      - dev.env
     volumes:
       - /app/node_modules
       - ./client:/app
-    ports:
-      - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
 
 volumes:
   mongo:
