@@ -17,4 +17,5 @@ services:
     mem_limit: 128m
     hostname: nginx
     ports:
-      - "80:80"
+      - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
