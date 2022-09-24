@@ -7,10 +7,14 @@ services:
     environment:
       - MONGODB_URI=mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_SERVER_IP}:${MONGODB_LOCAL_PORT}/
       - NODE_ENV=dev
+    networks:
+      - network
 
   client:
     image: "tianlin976/user-client"
     mem_limit: 128m
+    networks:
+      - network
 
   nginx:
     image: "tianlin976/user-nginx"
@@ -19,3 +23,9 @@ services:
     ports:
       - $CLIENT_LOCAL_PORT:$CLIENT_DOCKER_PORT
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
