@@ -88,7 +88,7 @@ pipeline{
         stage('Deploy Docker-Compose Remotely'){
             steps{
                 sh '''
-                APP_SERVER_IP=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=$APP_SERVER_NAME' \
+                APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                  --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 ssh ubuntu@${APP_SERVER_IP}
                 cd ~/docker-deployment
