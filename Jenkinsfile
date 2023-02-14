@@ -26,6 +26,8 @@ pipeline{
                 cd server
                 docker build -t ${DOCKER_USERNAME}/user-server:latest .
                 docker push ${DOCKER_USERNAME}/user-server:latest
+                echo 'Clean docker'
+                docker system prune -f
                 '''
             }
         }
@@ -37,6 +39,8 @@ pipeline{
                 cd client
                 docker build -t ${DOCKER_USERNAME}/user-client:latest .
                 docker push ${DOCKER_USERNAME}/user-client:latest
+                echo 'Clean docker'
+                docker system prune -f
                 '''
             }
         }
@@ -48,12 +52,6 @@ pipeline{
                 cd nginx
                 docker build -t ${DOCKER_USERNAME}/user-nginx:latest .
                 docker push ${DOCKER_USERNAME}/user-nginx:latest
-                '''
-            }
-        }
-        stage('Clean after Docker Build'){
-            steps{
-                sh '''
                 echo 'Clean docker'
                 docker system prune -f
                 '''
