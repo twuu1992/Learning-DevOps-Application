@@ -80,8 +80,8 @@ pipeline{
                 sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
 
                 echo 'Copy files to remote server'
-                scp ./docker-compose.yml jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/
-                scp ./.env jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/
+                scp ./docker-compose.yml jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/docker-compose.yml
+                scp ./.env jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/.env
                 '''
             }
         }
