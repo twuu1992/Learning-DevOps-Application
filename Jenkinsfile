@@ -2,7 +2,7 @@ pipeline{
     agent any
     stages {
         stage('Docker Version and Login') {
-            step{
+            steps{
                sh '''
                 docker --version
                 docker compose version
