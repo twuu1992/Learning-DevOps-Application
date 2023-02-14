@@ -73,9 +73,6 @@ pipeline{
                 echo 'Replace the variables of all env files'
                 unset MONGODB_IP
                 unset API_URI
-                unset APP_SERVER_IP
-                APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-app" \
-                --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-db" \
                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-app" \
