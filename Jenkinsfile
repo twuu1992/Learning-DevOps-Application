@@ -1,8 +1,9 @@
-// Variables
-def APP_SERVER_IP = ""
-
 pipeline{
     agent any
+    environment {
+        APP_SERVER_NAME = "my-user-app"
+        DB_SERVER_NAME = "my-user-db"
+    }
     stages {
         stage('Docker Version and Login') {
             steps{
@@ -60,14 +61,6 @@ pipeline{
                 '''
             }
         }
-        stage('Gathering required IP addresses'){
-            steps{
-                script{
-                    APP_SERVER_IP = sh( script: "aws ec2 describe-instances --filters 'Name=tag:Name,Values=my-user-app' --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text",
-                returnStdout: true).trim()
-                }
-            }
-        }
         stage('Prepare for Docker-Compose Deployment'){
             steps{
                 sh '''
@@ -76,9 +69,11 @@ pipeline{
                 echo 'Replace the variables of all env files'
                 unset MONGODB_IP
                 unset API_URI
-                MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-db" \
+                APP_SERVER_IP=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=${APP_SERVER_NAME}' \
+                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
+                MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${DB_SERVER_NAME}" \
                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-app" \
+                API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${APP_SERVER_NAME}" \
                 --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
                 
                 sed -i -e "s/{mongodb_ip}/$MONGODB_IP}/g" ./.env
@@ -93,6 +88,8 @@ pipeline{
         stage('Deploy Docker-Compose Remotely'){
             steps{
                 sh '''
+                APP_SERVER_IP=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=${APP_SERVER_NAME}' \
+                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 ssh ubuntu@${APP_SERVER_IP}
                 cd ~/docker-deployment
                 sudo chmod +x docker-compose.yml
@@ -103,13 +100,13 @@ pipeline{
                 '''
             }
         }
-        stage('Clean After Deployment'){
-            steps{
-                sh '''
-                echo 'Clean Directory'
-                rm -rf cd Learning-DevOps-Application
-                '''
-            }
-        }
+        // stage('Clean After Deployment'){
+        //     steps{
+        //         sh '''
+        //         echo 'Clean Directory'
+        //         rm -rf cd Learning-DevOps-Application
+        //         '''
+        //     }
+        // }
     }
 }
