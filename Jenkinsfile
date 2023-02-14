@@ -1,6 +1,6 @@
 pipeline{
     agent any
-    APP_SERVER_IP=""
+    def APP_SERVER_IP=""
     stages {
         stage('Docker Version and Login') {
             steps{
