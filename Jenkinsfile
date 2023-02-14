@@ -67,12 +67,17 @@ pipeline{
                 sh '''
                 cd Learning-DevOps-Application
 
-                echo 'Replace the mongo db ip address to env file'
+                echo 'Replace the variables of all env files'
                 unset MONGODB_IP
+                unset API_URI
                 MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-db" \
                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
+                API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-app" \
+                --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
                 echo "MONGODB SERVER IP: $MONGODB_IP
                 sed -i -e "s/{mongodb_ip}/$MONGODB_IP}/g" ./.env
+                sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
+                
 
                 echo 'Copy files to remote server'
                 scp ./docker-compose.yml ubuntu@${APP_SERVER_IP}:~/docker-deployment
