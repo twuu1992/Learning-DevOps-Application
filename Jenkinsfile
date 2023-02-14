@@ -63,9 +63,9 @@ pipeline{
         stage('Prepare for Docker-Compose Deployment'){
             steps{
                 script{
-                    APP_SERVER_IP = sh(script: "aws ec2 describe-instances --filters 'Name=tag:Name,Values=my-user-app' \
-                     --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text",
-                returnStdout: true)
+                    APP_SERVER_IP = sh( script: '''aws ec2 describe-instances --filters 'Name=tag:Name,Values=my-user-app' \
+                     --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text''',
+                returnStdout: true).trim()
                 }
                 sh '''
                 cd Learning-DevOps-Application
