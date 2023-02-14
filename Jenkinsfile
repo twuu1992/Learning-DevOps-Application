@@ -80,8 +80,8 @@ pipeline{
                 sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
 
                 echo 'Copy files to remote server'
-                scp ./docker-compose.yml ubuntu@${APP_SERVER_IP}:/home/ubuntu/docker-deployment
-                scp ./.env ubuntu@${APP_SERVER_IP}:/home/ubuntu/docker-deployment
+                scp ./docker-compose.yml jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/
+                scp ./.env jenkins@${APP_SERVER_IP}:/home/jenkins/docker-deployment/
                 '''
             }
         }
@@ -90,9 +90,9 @@ pipeline{
                 sh '''
                 APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                  --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                ssh ubuntu@${APP_SERVER_IP}
+                ssh jenkins@${APP_SERVER_IP}
                 whoami
-                cd /home/ubuntu/docker-deployment
+                cd /home/jenkins/docker-deployment
                 sudo chmod +x docker-compose.yml
                 sudo docker compose pull
                 sudo docker compose --env-file=.env up -d
