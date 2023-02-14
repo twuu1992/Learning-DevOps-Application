@@ -60,12 +60,16 @@ pipeline{
                 '''
             }
         }
-        stage('Prepare for Docker-Compose Deployment'){
+        stage('Gathering required IP addresses'){
             steps{
                 script{
                     APP_SERVER_IP = sh( script: "aws ec2 describe-instances --filters 'Name=tag:Name,Values=my-user-app' --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text",
                 returnStdout: true).trim()
                 }
+            }
+        }
+        stage('Prepare for Docker-Compose Deployment'){
+            steps{
                 sh '''
                 cd Learning-DevOps-Application
 
