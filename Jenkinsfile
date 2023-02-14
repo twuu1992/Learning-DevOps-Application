@@ -2,11 +2,14 @@ pipeline{
     agent any
     stages {
         stage('Docker Version and Login') {
-            sh '''
-            docker --version
-            docker compose version
-            docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-            '''
+            step{
+               sh '''
+                docker --version
+                docker compose version
+                docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+            ''' 
+            }
+            
         }
 
         stage('Checkout Repo') {
