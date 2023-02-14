@@ -69,11 +69,11 @@ pipeline{
                 echo 'Replace the variables of all env files'
                 unset MONGODB_IP
                 unset API_URI
-                APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${APP_SERVER_NAME}" \
+                APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                  --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${DB_SERVER_NAME}" \
+                MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$DB_SERVER_NAME" \
                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${APP_SERVER_NAME}" \
+                API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                 --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
                 
                 sed -i -e "s/{mongodb_ip}/$MONGODB_IP/g" ./.env
@@ -88,7 +88,7 @@ pipeline{
         stage('Deploy Docker-Compose Remotely'){
             steps{
                 sh '''
-                APP_SERVER_IP=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=${APP_SERVER_NAME}' \
+                APP_SERVER_IP=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=$APP_SERVER_NAME' \
                  --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 ssh ubuntu@${APP_SERVER_IP}
                 cd ~/docker-deployment
