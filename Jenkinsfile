@@ -72,7 +72,7 @@ pipeline{
                 --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                 API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=my-user-app" \
                 --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
-                echo "MONGODB SERVER IP: $MONGODB_IP
+                
                 sed -i -e "s/{mongodb_ip}/$MONGODB_IP}/g" ./.env
                 sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
 
