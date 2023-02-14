@@ -86,6 +86,7 @@ pipeline{
                 ssh ubuntu@${APP_SERVER_IP}
                 cd ~/docker-deployment
                 sudo chmod +x docker-compose.yml
+                sudo docker compose pull
                 sudo docker compose --env-file=.env up -d
 
                 exit
