@@ -43,7 +43,7 @@ pipeline{
                     sh '''
                     echo 'Build user client app'
                     unset API_URI
-                    // set to api server address if separate api and client
+                    # set to api server address if separate api and client
                     API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                     --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
                     sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
