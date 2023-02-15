@@ -42,6 +42,12 @@ pipeline{
                 dir('Learning-DevOps-Application'){
                     sh '''
                     echo 'Build user client app'
+                    unset API_URI
+                    // set to api server address if separate api and client
+                    API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
+                    --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
+                    sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
+
                     cd client
                     docker build -t ${DOCKER_USERNAME}/user-client:latest .
                     docker push ${DOCKER_USERNAME}/user-client:latest
@@ -73,16 +79,12 @@ pipeline{
                     sh '''
                     echo 'Replace the variables of all env files'
                     unset MONGODB_IP
-                    unset API_URI
                     APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                     --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
                     MONGODB_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$DB_SERVER_NAME" \
                     --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                    API_URI=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
-                    --query 'Reservations[*].Instances[*].[PublicDnsName]' --output text)
                     
                     sed -i -e "s/{mongodb_ip}/$MONGODB_IP/g" ./.env
-                    sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
 
                     echo 'Copy files to remote server'
                     if ! ssh ubuntu@${APP_SERVER_IP} '[ -d /home/ubuntu/docker-deployment ]'; then
