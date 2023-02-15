@@ -80,7 +80,7 @@ pipeline{
                 sed -i -e "s/{api_uri}/$API_URI/g" ./client/src/environments/environment.prod.ts
 
                 echo 'Copy files to remote server'
-                if ! ssh jenkins@${APP_SERVER_IP} '[ -d /home/jenkins/docker-deployment ]'
+                if ! ssh jenkins@${APP_SERVER_IP} '[ -d /home/jenkins/docker-deployment ]'; then
                     ssh jenkins@${APP_SERVER_IP} 'mkdir /home/jenkins/docker-deployment'
                 fi
 
