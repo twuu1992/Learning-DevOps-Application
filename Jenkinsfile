@@ -101,9 +101,9 @@ pipeline{
                 sh script: '''
                 APP_SERVER_IP=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$APP_SERVER_NAME" \
                  --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-                ssh ubuntu@${APP_SERVER_IP} 'sudo chmod +x /home/jenkins/docker-compose.yml'
-                ssh ubuntu@${APP_SERVER_IP} 'sudo docker compose pull'
-                ssh ubuntu@${APP_SERVER_IP} 'sudo docker compose --env-file=.env up -d'
+                ssh ubuntu@${APP_SERVER_IP} 'sudo chmod +x /home/ubuntu/docker-deployment/docker-compose.yml'
+                ssh ubuntu@${APP_SERVER_IP} 'cd /home/ubuntu/docker-deployment/ && sudo docker compose pull'
+                ssh ubuntu@${APP_SERVER_IP} 'cd /home/ubuntu/docker-deployment/ && sudo docker compose --env-file=.env up -d'
                 '''
             }
         }
